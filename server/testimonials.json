@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1782669344543",
+    "name": "sugarboi",
+    "role": "chair man",
+    "quote": "He is the president of the webiste and others activities done",
+    "stars": 5
+  },
+  {
+    "id": "1",
+    "name": "Sarah M.",
+    "role": "Startup Founder",
+    "quote": "Christian built our entire product from scratch — clean code, on time, and genuinely cared about making it work well. Exceptional.",
+    "stars": 5
+  },
+  {
+    "id": "2",
+    "name": "Pastor James K.",
+    "role": "Church Leader",
+    "quote": "The church management system he built transformed how we operate. He understood our mission and built something that truly serves us.",
+    "stars": 5
+  },
+  {
+    "id": "3",
+    "name": "David R.",
+    "role": "Tech Lead",
+    "quote": "Brought him in for a consulting session and walked away with a clear architecture plan and actionable steps. Highly recommend.",
+    "stars": 5
+  }
+]
