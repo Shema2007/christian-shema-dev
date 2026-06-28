@@ -1,185 +1,158 @@
-import { useEffect, useRef } from 'react'
+import { ArrowRight, Download, MessageCircle } from 'lucide-react'
 
-export default function Hero() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+interface HeroProps {
+  setActivePage: (page: string) => void
+}
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    resize()
-    window.addEventListener('resize', resize)
-
-    const particles: { x: number; y: number; vx: number; vy: number; r: number; alpha: number }[] = []
-    for (let i = 0; i < 60; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 1.5 + 0.5,
-        alpha: Math.random() * 0.4 + 0.1,
-      })
-    }
-
-    let animId: number
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      particles.forEach(p => {
-        p.x += p.vx
-        p.y += p.vy
-        if (p.x < 0) p.x = canvas.width
-        if (p.x > canvas.width) p.x = 0
-        if (p.y < 0) p.y = canvas.height
-        if (p.y > canvas.height) p.y = 0
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(108,99,255,${p.alpha})`
-        ctx.fill()
-      })
-
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x
-          const dy = particles[i].y - particles[j].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 120) {
-            ctx.beginPath()
-            ctx.moveTo(particles[i].x, particles[i].y)
-            ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = `rgba(108,99,255,${0.08 * (1 - dist / 120)})`
-            ctx.stroke()
-          }
-        }
-      }
-
-      animId = requestAnimationFrame(draw)
-    }
-    draw()
-
-    return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener('resize', resize)
-    }
-  }, [])
+export default function Hero({ setActivePage }: HeroProps) {
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
   return (
     <section style={{
-      position: 'relative',
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      textAlign: 'center',
+      padding: '0 2rem',
+      paddingTop: '80px',
+      position: 'relative',
       overflow: 'hidden',
     }}>
-      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
-
+      {/* Radial glow */}
       <div style={{
         position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(108,99,255,0.08) 0%, transparent 70%)',
+        top: '20%', left: '50%',
+        transform: 'translateX(-50%)',
+        width: 600, height: 400,
+        background: 'radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
-      <div style={{ position: 'relative', textAlign: 'center', maxWidth: 700, padding: '0 2rem' }}>
-        <p style={{
-          color: 'var(--accent)',
-          fontSize: '0.85rem',
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          marginBottom: '1.5rem',
-          opacity: 0.8,
+      <div style={{ position: 'relative', maxWidth: 800 }}>
+        {/* Badge */}
+        <div className="fade-up" style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+          padding: '0.35rem 1rem',
+          background: 'rgba(59,130,246,0.1)',
+          border: '1px solid rgba(59,130,246,0.25)',
+          borderRadius: '99px',
+          fontSize: '0.8rem',
+          color: 'var(--blue)',
+          fontWeight: 500,
+          marginBottom: '2rem',
         }}>
-          Software Developer
-        </p>
-        <h1 style={{
-          fontSize: 'clamp(3rem, 8vw, 6rem)',
-          fontWeight: 800,
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--blue)', display: 'inline-block' }} />
+          Available for Work
+        </div>
+
+        {/* Headline */}
+        <h1 className="fade-up-1" style={{
+          fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+          fontWeight: 900,
           lineHeight: 1.05,
           letterSpacing: '-0.04em',
           marginBottom: '1.5rem',
-          background: 'linear-gradient(135deg, #e8e8f0 0%, #a89fff 60%, #6c63ff 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
         }}>
-          Christian Shema
+          Code with{' '}
+          <span style={{ color: 'var(--blue)' }}>Purpose.</span>
+          <br />
+          Build for His Glory.
         </h1>
-        <p style={{
-          color: 'var(--muted)',
-          fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-          lineHeight: 1.7,
-          maxWidth: 520,
+
+        {/* Subtitle */}
+        <p className="fade-up-2" style={{
+          fontSize: 'clamp(1rem, 2.5vw, 1.15rem)',
+          color: 'var(--text-muted)',
+          lineHeight: 1.75,
+          maxWidth: 560,
           margin: '0 auto 2.5rem',
         }}>
-          I build thoughtful digital experiences — clean code, purposeful design,
-          and software that actually matters to the people using it.
+          Precision engineering for the modern web. I design and build scalable,
+          reliable, and high-performing digital systems.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a
-            href="#projects"
-            style={{
-              padding: '0.85rem 2rem',
-              background: 'var(--accent)',
-              color: 'white',
-              borderRadius: '8px',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              transition: 'opacity 0.2s, transform 0.2s',
-              display: 'inline-block',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
-          >
-            View My Work
-          </a>
-          <a
-            href="#contact"
-            style={{
-              padding: '0.85rem 2rem',
-              border: '1px solid rgba(108,99,255,0.4)',
-              color: 'var(--accent-light)',
-              borderRadius: '8px',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
-              display: 'inline-block',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'rgba(108,99,255,0.08)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(108,99,255,0.4)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateY(0)' }}
-          >
-            Get in Touch
-          </a>
-        </div>
-      </div>
 
-      <div style={{
-        position: 'absolute',
-        bottom: '2.5rem',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '0.5rem',
-        color: 'var(--muted)',
-        fontSize: '0.75rem',
-        letterSpacing: '0.1em',
-        textTransform: 'uppercase',
-      }}>
-        <span>Scroll</span>
-        <div style={{
-          width: 1,
-          height: 40,
-          background: 'linear-gradient(to bottom, var(--muted), transparent)',
-          animation: 'pulse 2s infinite',
-        }} />
+        {/* CTAs */}
+        <div className="fade-up-3" style={{
+          display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap',
+        }}>
+          <button
+            onClick={() => scrollTo('projects')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.85rem 1.75rem',
+              background: 'var(--blue)',
+              color: 'white',
+              borderRadius: '10px',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              transition: 'background 0.2s, transform 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-dark)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--blue)'; e.currentTarget.style.transform = 'translateY(0)' }}
+          >
+            View My Work <ArrowRight size={16} />
+          </button>
+
+          <a
+            href="/cv.pdf"
+            download
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.85rem 1.75rem',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'white',
+              borderRadius: '10px',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              transition: 'background 0.2s, transform 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'translateY(0)' }}
+          >
+            <Download size={16} /> Download CV
+          </a>
+
+          <button
+            onClick={() => scrollTo('contact')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.85rem 1.75rem',
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.15)',
+              color: 'white',
+              borderRadius: '10px',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              transition: 'border-color 0.2s, background 0.2s, transform 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--blue)'; e.currentTarget.style.background = 'rgba(59,130,246,0.08)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateY(0)' }}
+          >
+            <MessageCircle size={16} /> Let's Talk
+          </button>
+        </div>
+
+        {/* Stats row */}
+        <div className="fade-up-4" style={{
+          display: 'flex', justifyContent: 'center', gap: '3rem',
+          marginTop: '4rem',
+          paddingTop: '3rem',
+          borderTop: '1px solid var(--border)',
+          flexWrap: 'wrap',
+        }}>
+          {[
+            { num: '3+', label: 'Years Experience' },
+            { num: '20+', label: 'Projects Shipped' },
+            { num: '10+', label: 'Happy Clients' },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: '2rem', fontWeight: 800, color: 'white', letterSpacing: '-0.03em' }}>{s.num}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{s.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
