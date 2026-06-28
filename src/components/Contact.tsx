@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Mail, Phone } from 'lucide-react'
+import { Mail, Phone, Send, Loader2 } from 'lucide-react'
 
 interface ContactProps {
   fullPage?: boolean
@@ -31,7 +31,8 @@ const socials = [
 
 export default function Contact({ fullPage }: ContactProps) {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -44,6 +45,26 @@ export default function Contact({ fullPage }: ContactProps) {
     outline: 'none',
     fontFamily: 'inherit',
     transition: 'border-color 0.2s',
+    boxSizing: 'border-box',
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setStatus('sending')
+    setErrorMsg('')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Something went wrong')
+      setStatus('sent')
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to send message')
+      setStatus('error')
+    }
   }
 
   return (
@@ -54,8 +75,8 @@ export default function Contact({ fullPage }: ContactProps) {
     }}>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '5rem',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '4rem',
         alignItems: 'center',
       }}>
         {/* Left: Main CTA */}
@@ -186,17 +207,22 @@ export default function Contact({ fullPage }: ContactProps) {
             I usually reply within a few hours.
           </p>
 
-          {sent ? (
+          {status === 'sent' ? (
             <div style={{ textAlign: 'center', padding: '2.5rem 0' }}>
               <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
               <h4 style={{ fontWeight: 700, marginBottom: '0.4rem' }}>Message sent!</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>I'll get back to you soon.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+                I'll get back to you soon.
+              </p>
+              <button
+                onClick={() => { setStatus('idle'); setForm({ name: '', email: '', message: '' }) }}
+                style={{ color: 'var(--blue)', fontSize: '0.85rem', fontWeight: 600 }}
+              >
+                Send another →
+              </button>
             </div>
           ) : (
-            <form
-              onSubmit={e => { e.preventDefault(); setSent(true) }}
-              style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}
-            >
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <input
                 required
                 placeholder="Your name"
@@ -226,21 +252,35 @@ export default function Contact({ fullPage }: ContactProps) {
                 onFocus={e => e.target.style.borderColor = 'var(--blue)'}
                 onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
               />
+
+              {status === 'error' && (
+                <p style={{ color: '#f87171', fontSize: '0.82rem', marginTop: '-0.25rem' }}>
+                  ⚠ {errorMsg}
+                </p>
+              )}
+
               <button
                 type="submit"
+                disabled={status === 'sending'}
                 style={{
                   padding: '0.85rem',
-                  background: 'var(--blue)',
+                  background: status === 'sending' ? 'rgba(59,130,246,0.6)' : 'var(--blue)',
                   color: 'white',
                   borderRadius: '10px',
                   fontWeight: 700,
                   fontSize: '0.9rem',
                   transition: 'background 0.2s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                  cursor: status === 'sending' ? 'not-allowed' : 'pointer',
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'var(--blue-dark)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'var(--blue)'}
+                onMouseEnter={e => { if (status !== 'sending') e.currentTarget.style.background = 'var(--blue-dark)' }}
+                onMouseLeave={e => { if (status !== 'sending') e.currentTarget.style.background = 'var(--blue)' }}
               >
-                Send Message
+                {status === 'sending' ? (
+                  <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…</>
+                ) : (
+                  <><Send size={15} /> Send Message</>
+                )}
               </button>
             </form>
           )}

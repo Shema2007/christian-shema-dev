@@ -3,6 +3,7 @@ import cors from 'cors'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import nodemailer from 'nodemailer'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_FILE = path.join(__dirname, 'videos.json')
@@ -71,6 +72,53 @@ app.delete('/api/videos/:id', (req, res) => {
 app.post('/api/auth', (req, res) => {
   const { pin } = req.body
   res.json({ valid: pin === ADMIN_PIN })
+})
+
+// POST contact form — sends email via Gmail SMTP
+app.post('/api/contact', async (req, res) => {
+  const { name, email, message } = req.body
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'All fields are required' })
+  }
+
+  const GMAIL_USER = process.env.GMAIL_USER
+  const GMAIL_PASS = process.env.GMAIL_PASS
+
+  if (!GMAIL_USER || !GMAIL_PASS) {
+    // Email not configured — log it and return success so the form works
+    console.log(`[Contact form] From: ${name} <${email}>\n${message}`)
+    return res.json({ success: true, note: 'Email credentials not set — message logged to console' })
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: GMAIL_USER, pass: GMAIL_PASS },
+    })
+
+    await transporter.sendMail({
+      from: `"${name}" <${GMAIL_USER}>`,
+      to: 'christianirasubizashema@gmail.com',
+      replyTo: email,
+      subject: `Portfolio message from ${name}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:12px">
+          <h2 style="color:#1d4ed8;margin-top:0">New message via your portfolio</h2>
+          <table style="width:100%;border-collapse:collapse">
+            <tr><td style="padding:8px 0;color:#555;font-weight:600;width:80px">Name</td><td style="padding:8px 0">${name}</td></tr>
+            <tr><td style="padding:8px 0;color:#555;font-weight:600">Email</td><td style="padding:8px 0"><a href="mailto:${email}">${email}</a></td></tr>
+          </table>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0"/>
+          <p style="color:#111;white-space:pre-wrap;line-height:1.7">${message}</p>
+        </div>
+      `,
+    })
+
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[Contact] Email error:', err.message)
+    res.status(500).json({ error: 'Failed to send email. Please try again.' })
+  }
 })
 
 function getThumbnail(url) {

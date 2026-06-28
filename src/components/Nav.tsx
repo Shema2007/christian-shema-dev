@@ -49,7 +49,7 @@ export default function Nav({ activePage, setActivePage }: NavProps) {
       top: 0, left: 0, right: 0,
       zIndex: 1000,
       padding: '0 2rem',
-      height: 64,
+      height: 68,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -61,15 +61,22 @@ export default function Nav({ activePage, setActivePage }: NavProps) {
       {/* Logo */}
       <button
         onClick={() => { setActivePage('home'); window.scrollTo({ top: 0 }) }}
-        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '0.6rem',
+          padding: '0.2rem',
+        }}
       >
-        <div style={{
-          width: 32, height: 32,
-          background: 'var(--blue)',
-          borderRadius: '8px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontWeight: 800, fontSize: '0.9rem',
-        }}>CS</div>
+        <img
+          src="/logo.png"
+          alt="Christian Shema — SHEMA Developer"
+          style={{
+            height: 48,
+            width: 'auto',
+            objectFit: 'contain',
+            display: 'block',
+            filter: 'drop-shadow(0 0 8px rgba(59,130,246,0.35))',
+          }}
+        />
       </button>
 
       {/* Desktop Links */}
