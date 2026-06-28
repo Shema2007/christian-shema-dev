@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Video, X, Upload, Lock, Eye, EyeOff, Play } from 'lucide-react'
+import { Plus, Trash2, Video, X, Upload, Lock, Eye, EyeOff, Play, RefreshCw } from 'lucide-react'
 
 interface VideoItem {
   id: string
@@ -16,7 +16,6 @@ interface VideosProps {
 }
 
 const CATEGORIES = ['All', 'AI Tools', 'VS Code', 'Web Dev', 'Systems', 'Tutorial', 'Other']
-const ADMIN_PIN = '2025'
 
 function getYouTubeId(url: string): string | null {
   const patterns = [
@@ -32,97 +31,79 @@ function getYouTubeId(url: string): string | null {
   return null
 }
 
-function getThumbnail(url: string): string {
-  const id = getYouTubeId(url)
-  if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`
-  return ''
-}
-
 function getEmbedUrl(url: string): string {
   const id = getYouTubeId(url)
   if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`
   return url
 }
 
-function loadVideos(): VideoItem[] {
-  try {
-    return JSON.parse(localStorage.getItem('cs_videos') || '[]')
-  } catch {
-    return []
+async function apiFetch(path: string, opts?: RequestInit) {
+  const res = await fetch(`/api${path}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Request failed' }))
+    throw new Error(err.error || 'Request failed')
   }
+  return res.json()
 }
-
-function saveVideos(videos: VideoItem[]) {
-  localStorage.setItem('cs_videos', JSON.stringify(videos))
-}
-
-const SAMPLE_VIDEOS: VideoItem[] = [
-  {
-    id: '1',
-    title: 'How I Use AI + VS Code to Build Websites in Minutes',
-    description: 'A walkthrough of my AI-assisted development workflow using GitHub Copilot, Cursor, and VS Code extensions to ship websites faster.',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-    category: 'AI Tools',
-    date: 'June 20, 2025',
-  },
-  {
-    id: '2',
-    title: 'Building a Full-Stack App with Replit in 30 Minutes',
-    description: 'Live coding session where I build and deploy a complete web application using Replit\'s AI tools from scratch.',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-    category: 'Web Dev',
-    date: 'June 10, 2025',
-  },
-  {
-    id: '3',
-    title: 'My VS Code Setup for AI-Powered Development',
-    description: 'Every extension, keybinding, and snippet I use daily. This setup cut my development time by 40%.',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-    category: 'VS Code',
-    date: 'May 28, 2025',
-  },
-]
 
 export default function Videos({ fullPage }: VideosProps) {
-  const [videos, setVideos] = useState<VideoItem[]>(() => {
-    const stored = loadVideos()
-    if (stored.length === 0) {
-      saveVideos(SAMPLE_VIDEOS)
-      return SAMPLE_VIDEOS
-    }
-    return stored
-  })
+  const [videos, setVideos] = useState<VideoItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('All')
   const [playing, setPlaying] = useState<string | null>(null)
+
+  // Admin state
   const [showAdmin, setShowAdmin] = useState(false)
   const [isAuthed, setIsAuthed] = useState(false)
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState(false)
+  const [showPin, setShowPin] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ title: '', description: '', url: '', category: 'Web Dev' })
   const [formError, setFormError] = useState('')
-  const [showPin, setShowPin] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [adminPin, setAdminPin] = useState('')
 
-  useEffect(() => {
-    saveVideos(videos)
-  }, [videos])
+  const fetchVideos = async () => {
+    try {
+      setLoading(true)
+      const data = await apiFetch('/videos')
+      setVideos(data)
+    } catch {
+      // fallback silently
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchVideos() }, [])
 
   const filtered = activeCategory === 'All' ? videos : videos.filter(v => v.category === activeCategory)
 
-  const handleAuth = () => {
-    if (pin === ADMIN_PIN) {
-      setIsAuthed(true)
-      setPinError(false)
-      setPin('')
-    } else {
+  const handleAuth = async () => {
+    try {
+      const res = await apiFetch('/auth', {
+        method: 'POST',
+        body: JSON.stringify({ pin }),
+      })
+      if (res.valid) {
+        setIsAuthed(true)
+        setAdminPin(pin)
+        setPinError(false)
+        setPin('')
+      } else {
+        setPinError(true)
+      }
+    } catch {
       setPinError(true)
     }
   }
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!form.title.trim() || !form.url.trim()) {
       setFormError('Title and URL are required.')
       return
@@ -131,25 +112,37 @@ export default function Videos({ fullPage }: VideosProps) {
       setFormError('Please enter a valid YouTube URL.')
       return
     }
-    const newVideo: VideoItem = {
-      id: Date.now().toString(),
-      title: form.title.trim(),
-      description: form.description.trim(),
-      url: form.url.trim(),
-      thumbnail: getThumbnail(form.url.trim()),
-      category: form.category,
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    try {
+      setSaving(true)
+      setFormError('')
+      const newVideo = await apiFetch('/videos', {
+        method: 'POST',
+        body: JSON.stringify({ ...form, pin: adminPin }),
+      })
+      setVideos(prev => [newVideo, ...prev])
+      setForm({ title: '', description: '', url: '', category: 'Web Dev' })
+      setShowAdd(false)
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : 'Failed to add video.')
+    } finally {
+      setSaving(false)
     }
-    setVideos(prev => [newVideo, ...prev])
-    setForm({ title: '', description: '', url: '', category: 'Web Dev' })
-    setFormError('')
-    setShowAdd(false)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm('Delete this video?')) {
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this video?')) return
+    try {
+      setDeleting(id)
+      await apiFetch(`/videos/${id}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ pin: adminPin }),
+      })
       setVideos(prev => prev.filter(v => v.id !== id))
       if (playing === id) setPlaying(null)
+    } catch {
+      alert('Failed to delete video.')
+    } finally {
+      setDeleting(null)
     }
   }
 
@@ -182,7 +175,7 @@ export default function Videos({ fullPage }: VideosProps) {
             Videos
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-            Watch me build with AI, VS Code, and modern web tools.
+            Building systems, websites & apps — using AI and VS Code.
           </p>
         </div>
         <button
@@ -224,19 +217,35 @@ export default function Videos({ fullPage }: VideosProps) {
         ))}
       </div>
 
-      {/* Video grid */}
-      {filtered.length === 0 ? (
+      {/* Loading */}
+      {loading && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', padding: '4rem', color: 'var(--text-muted)' }}>
+          <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} />
+          <span>Loading videos...</span>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && filtered.length === 0 && (
         <div style={{
           textAlign: 'center', padding: '5rem 2rem',
           background: 'var(--navy-2)',
           border: '1px solid var(--border)',
-          borderRadius: '16px',
+          borderRadius: '20px',
         }}>
-          <Video size={40} color="var(--text-dim)" style={{ marginBottom: '1rem' }} />
-          <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>No videos yet in this category.</p>
-          <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginTop: '0.25rem' }}>Click "Manage Videos" to add your first one.</p>
+          <Video size={44} color="var(--text-dim)" style={{ marginBottom: '1.25rem' }} />
+          <h3 style={{ fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+            {activeCategory === 'All' ? 'No videos yet' : `No videos in "${activeCategory}"`}
+          </h3>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
+            Click "Manage Videos" to add your first YouTube video.
+          </p>
         </div>
-      ) : (
+      )}
+
+      {/* Video grid */}
+      {!loading && filtered.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {filtered.map(video => (
             <div key={video.id} style={{
@@ -274,19 +283,20 @@ export default function Videos({ fullPage }: VideosProps) {
                     {/* Play overlay */}
                     <div style={{
                       position: 'absolute', inset: 0,
-                      background: 'rgba(0,0,0,0.35)',
+                      background: 'rgba(0,0,0,0.3)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'background 0.2s',
                     }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.35)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.3)'}
                     >
                       <div style={{
                         width: 56, height: 56,
                         background: 'var(--blue)',
                         borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 0 0 8px rgba(59,130,246,0.25)',
+                        boxShadow: '0 0 0 10px rgba(59,130,246,0.2)',
+                        transition: 'transform 0.15s',
                       }}>
                         <Play size={22} fill="white" color="white" style={{ marginLeft: 3 }} />
                       </div>
@@ -297,7 +307,7 @@ export default function Videos({ fullPage }: VideosProps) {
 
               {/* Info */}
               <div style={{ padding: '1.25rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.6rem' }}>
                   <span style={{
                     padding: '0.2rem 0.6rem',
                     background: 'rgba(59,130,246,0.1)',
@@ -314,7 +324,10 @@ export default function Videos({ fullPage }: VideosProps) {
                   {video.title}
                 </h3>
                 {video.description && (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <p style={{
+                    color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.65,
+                    display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  }}>
                     {video.description}
                   </p>
                 )}
@@ -324,7 +337,7 @@ export default function Videos({ fullPage }: VideosProps) {
         </div>
       )}
 
-      {/* Admin Modal */}
+      {/* ── Admin Modal ── */}
       {showAdmin && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 2000,
@@ -339,7 +352,7 @@ export default function Videos({ fullPage }: VideosProps) {
             borderRadius: '20px',
             padding: '2rem',
             width: '100%',
-            maxWidth: isAuthed ? 700 : 380,
+            maxWidth: isAuthed ? 680 : 380,
             maxHeight: '90vh',
             overflowY: 'auto',
             position: 'relative',
@@ -367,7 +380,7 @@ export default function Videos({ fullPage }: VideosProps) {
                 }}>
                   <Lock size={24} color="var(--blue)" />
                 </div>
-                <h3 style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>Admin Access</h3>
+                <h3 style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.4rem' }}>Admin Access</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.75rem' }}>
                   Enter your PIN to manage videos
                 </p>
@@ -383,7 +396,7 @@ export default function Videos({ fullPage }: VideosProps) {
                       borderColor: pinError ? '#ef4444' : 'rgba(255,255,255,0.1)',
                       letterSpacing: '0.2em',
                       textAlign: 'center',
-                      fontSize: '1.25rem',
+                      fontSize: '1.5rem',
                       paddingRight: '3rem',
                     }}
                     autoFocus
@@ -418,7 +431,7 @@ export default function Videos({ fullPage }: VideosProps) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem' }}>
                   <div>
                     <h3 style={{ fontWeight: 700, fontSize: '1.2rem' }}>Manage Videos</h3>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>{videos.length} video{videos.length !== 1 ? 's' : ''} total</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>{videos.length} video{videos.length !== 1 ? 's' : ''} saved</p>
                   </div>
                   <button onClick={() => { setShowAdd(true); setFormError('') }} style={{
                     display: 'flex', alignItems: 'center', gap: '0.4rem',
@@ -440,7 +453,7 @@ export default function Videos({ fullPage }: VideosProps) {
                 {/* Add form */}
                 {showAdd && (
                   <div style={{
-                    background: 'rgba(59,130,246,0.05)',
+                    background: 'rgba(59,130,246,0.04)',
                     border: '1px solid rgba(59,130,246,0.2)',
                     borderRadius: '12px',
                     padding: '1.5rem',
@@ -457,7 +470,7 @@ export default function Videos({ fullPage }: VideosProps) {
                         onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                       />
                       <input
-                        placeholder="YouTube URL * (e.g. https://youtube.com/watch?v=...)"
+                        placeholder="YouTube URL * — e.g. https://youtube.com/watch?v=..."
                         value={form.url}
                         onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
                         style={inputStyle}
@@ -476,28 +489,26 @@ export default function Videos({ fullPage }: VideosProps) {
                       <select
                         value={form.category}
                         onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                        style={{ ...inputStyle }}
+                        style={{ ...inputStyle, cursor: 'pointer' }}
                       >
                         {CATEGORIES.filter(c => c !== 'All').map(c => (
-                          <option key={c} value={c}>{c}</option>
+                          <option key={c} value={c} style={{ background: '#0c1428' }}>{c}</option>
                         ))}
                       </select>
                       {formError && <p style={{ color: '#ef4444', fontSize: '0.8rem' }}>{formError}</p>}
                       <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <button onClick={handleAdd} style={{
+                        <button onClick={handleAdd} disabled={saving} style={{
                           flex: 1,
                           padding: '0.75rem',
-                          background: 'var(--blue)',
+                          background: saving ? 'var(--navy-3)' : 'var(--blue)',
                           color: 'white',
                           borderRadius: '8px',
                           fontWeight: 700,
                           fontSize: '0.875rem',
                           transition: 'background 0.2s',
-                        }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--blue-dark)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'var(--blue)'}
-                        >
-                          Add Video
+                          opacity: saving ? 0.7 : 1,
+                        }}>
+                          {saving ? 'Saving...' : 'Add Video'}
                         </button>
                         <button onClick={() => { setShowAdd(false); setFormError('') }} style={{
                           padding: '0.75rem 1.25rem',
@@ -507,9 +518,7 @@ export default function Videos({ fullPage }: VideosProps) {
                           borderRadius: '8px',
                           fontWeight: 600,
                           fontSize: '0.875rem',
-                        }}>
-                          Cancel
-                        </button>
+                        }}>Cancel</button>
                       </div>
                     </div>
                   </div>
@@ -526,28 +535,32 @@ export default function Videos({ fullPage }: VideosProps) {
                       <div key={v.id} style={{
                         display: 'flex', alignItems: 'center', gap: '1rem',
                         padding: '0.9rem 1rem',
-                        background: 'rgba(255,255,255,0.03)',
+                        background: 'rgba(255,255,255,0.02)',
                         border: '1px solid var(--border)',
                         borderRadius: '10px',
                       }}>
                         {v.thumbnail ? (
-                          <img src={v.thumbnail} alt="" style={{ width: 64, height: 40, objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
+                          <img src={v.thumbnail} alt="" style={{ width: 72, height: 44, objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
                         ) : (
-                          <div style={{ width: 64, height: 40, background: 'var(--navy-3)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <div style={{ width: 72, height: 44, background: 'var(--navy-3)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             <Video size={16} color="var(--text-dim)" />
                           </div>
                         )}
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.title}</p>
-                          <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', marginTop: '0.15rem' }}>{v.category} · {v.date}</p>
+                          <p style={{ fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.title}</p>
+                          <p style={{ color: 'var(--text-dim)', fontSize: '0.73rem', marginTop: '0.15rem' }}>{v.category} · {v.date}</p>
                         </div>
-                        <button onClick={() => handleDelete(v.id)} style={{
-                          color: 'var(--text-dim)',
-                          padding: '0.35rem',
-                          borderRadius: '6px',
-                          transition: 'color 0.2s, background 0.2s',
-                          flexShrink: 0,
-                        }}
+                        <button
+                          onClick={() => handleDelete(v.id)}
+                          disabled={deleting === v.id}
+                          style={{
+                            color: deleting === v.id ? 'var(--text-dim)' : 'var(--text-dim)',
+                            padding: '0.4rem',
+                            borderRadius: '6px',
+                            transition: 'color 0.2s, background 0.2s',
+                            flexShrink: 0,
+                            opacity: deleting === v.id ? 0.5 : 1,
+                          }}
                           onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.1)' }}
                           onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-dim)'; e.currentTarget.style.background = 'transparent' }}
                         >

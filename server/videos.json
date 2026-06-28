@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "title": "Building a Full-Stack Web App from Scratch — React, Node.js & PostgreSQL",
+    "description": "A complete walkthrough of building and deploying a production-ready full-stack application using React, Node.js, Express, and PostgreSQL. From local setup to live deployment.",
+    "url": "https://www.youtube.com/watch?v=Tn6-PIqc4UM",
+    "thumbnail": "https://img.youtube.com/vi/Tn6-PIqc4UM/hqdefault.jpg",
+    "category": "Web Dev",
+    "date": "June 20, 2025"
+  },
+  {
+    "id": "2",
+    "title": "Using GitHub Copilot + VS Code to Build a REST API in 20 Minutes",
+    "description": "Watch how AI-assisted coding with GitHub Copilot and VS Code can dramatically speed up building a REST API — from routes to database models to deployment.",
+    "url": "https://www.youtube.com/watch?v=DHjqpvDnNGE",
+    "thumbnail": "https://img.youtube.com/vi/DHjqpvDnNGE/hqdefault.jpg",
+    "category": "AI Tools",
+    "date": "June 15, 2025"
+  },
+  {
+    "id": "3",
+    "title": "VS Code Setup for Modern Web Development — Every Extension I Use Daily",
+    "description": "My complete VS Code configuration for full-stack development: extensions, themes, snippets, keybindings, and productivity tricks that cut my development time in half.",
+    "url": "https://www.youtube.com/watch?v=x7X9w_GIm1s",
+    "thumbnail": "https://img.youtube.com/vi/x7X9w_GIm1s/hqdefault.jpg",
+    "category": "VS Code",
+    "date": "June 8, 2025"
+  },
+  {
+    "id": "4",
+    "title": "Building a Church Management System — Full-Stack App Walkthrough",
+    "description": "A deep dive into designing and building a real production system: member management, event scheduling, finance tracking — using React, Express, and PostgreSQL.",
+    "url": "https://www.youtube.com/watch?v=ENrzD9KYKAQ",
+    "thumbnail": "https://img.youtube.com/vi/ENrzD9KYKAQ/hqdefault.jpg",
+    "category": "Systems",
+    "date": "May 28, 2025"
+  },
+  {
+    "id": "5",
+    "title": "How I Build Mobile-Ready Web Apps Fast — PWA & Responsive Design",
+    "description": "The workflow I use to ship mobile-ready web apps quickly: progressive web app setup, responsive layouts, touch interactions, and offline support.",
+    "url": "https://www.youtube.com/watch?v=zQnBQ4tB3ZA",
+    "thumbnail": "https://img.youtube.com/vi/zQnBQ4tB3ZA/hqdefault.jpg",
+    "category": "Web Dev",
+    "date": "May 15, 2025"
+  },
+  {
+    "id": "6",
+    "title": "AI-Assisted App Development — Building a Task Manager with Cursor & GPT-4",
+    "description": "A live coding session showing exactly how I use Cursor IDE and GPT-4 to design, code, and ship a complete task management app from idea to deployment.",
+    "url": "https://www.youtube.com/watch?v=Nxer5_y1kLM",
+    "thumbnail": "https://img.youtube.com/vi/Nxer5_y1kLM/hqdefault.jpg",
+    "category": "AI Tools",
+    "date": "May 5, 2025"
+  }
+]

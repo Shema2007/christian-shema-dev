@@ -4,16 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 5000",
+    "dev": "node server/index.js & vite --host 0.0.0.0 --port 5000",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "server": "node server/index.js",
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "framer-motion": "^11.3.19",
-    "lucide-react": "^0.438.0"
+    "lucide-react": "^0.438.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
