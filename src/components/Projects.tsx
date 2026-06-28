@@ -7,7 +7,7 @@ const projects = [
     title: 'Kapo Kitchenware',
     desc: 'A production e-commerce site built for Kapo Kitchenware — a local brand selling premium kitchen tools. Features clean product browsing, a responsive mobile-first layout, and a smooth checkout experience built for new customers.',
     tags: ['React', 'Node.js', 'Tailwind', 'E-Commerce'],
-    link: '#',
+    link: 'https://kapo-kitchenwarezip2zip-1zipzipejoz-tawny.vercel.app',
     gradient: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
     visual: 'ecommerce',
   },

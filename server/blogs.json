@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "title": "How I Use GitHub Copilot to Build Faster Without Losing Control",
+    "date": "June 15, 2025",
+    "tag": "AI Tools",
+    "excerpt": "AI coding assistants are powerful — but only if you use them intentionally. Here's my workflow for staying in the driver's seat.",
+    "content": "GitHub Copilot has changed how I write code — but not in the way most people expect. I don't let it drive. I use it as a very fast autocomplete that understands context. The key is to always review, always understand, and never accept code you can't explain. In this post I walk through my exact workflow: how I prompt it, when I turn it off, and how I catch its mistakes before they ship."
+  },
+  {
+    "id": "2",
+    "title": "VS Code Setup for Full-Stack Development in 2025",
+    "date": "May 28, 2025",
+    "tag": "Productivity",
+    "excerpt": "My complete VS Code configuration — extensions, keybindings, and snippets that make me significantly more productive every day.",
+    "content": "After years of tweaking, I've landed on a VS Code setup that feels like a natural extension of my brain. This post covers my must-have extensions (Prettier, ESLint, GitLens, REST Client), my custom keybindings for fast file switching, and the snippets I use daily for React components and API routes. I also share my settings.json so you can clone the whole setup in minutes."
+  },
+  {
+    "id": "3",
+    "title": "Building a Church Management System with React + PostgreSQL",
+    "date": "May 10, 2025",
+    "tag": "Projects",
+    "excerpt": "A deep dive into architecting a real-world app that serves a ministry — from requirements gathering to deployment.",
+    "content": "This project was one of the most meaningful things I've ever built. A local church needed a way to manage members, track attendance, send announcements, and handle donations. I built a full-stack app with React on the front end, a Node/Express API, and PostgreSQL for storage. The biggest challenge wasn't the code — it was understanding exactly what the church leaders needed and translating that into software."
+  }
+]
