@@ -87,7 +87,7 @@ export default function Footer({ setActivePage, onHireMe }: FooterProps) {
               transition={{ duration: 0.6, ease }}
             >
               <div style={{ marginBottom: '1.25rem' }}>
-                <img src="/logo.png" alt="Shema Dev" style={{ height: 70, filter: 'drop-shadow(0 0 8px rgba(59,130,246,0.4))' }} />
+                <img src="/logo.png" alt="Shema Dev" style={{ height: 66, filter: 'drop-shadow(0 0 8px rgba(59,130,246,0.4))' }} />
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.8, maxWidth: 270, marginBottom: '1.5rem' }}>
                 Full-stack developer building precise, purposeful software — faith-driven and detail-obsessed.

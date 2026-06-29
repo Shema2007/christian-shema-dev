@@ -98,7 +98,7 @@ export default function Nav({ activePage, setActivePage, onHireMe }: NavProps) {
           <img
             src="/logo.png"
             alt="Christian Shema"
-            style={{ height: 77, width: 'auto', objectFit: 'contain', display: 'block', filter: 'drop-shadow(0 0 8px rgba(59,130,246,0.4))' }}
+            style={{ height: 72, width: 'auto', objectFit: 'contain', display: 'block', filter: 'drop-shadow(0 0 8px rgba(59,130,246,0.4))' }}
           />
         </motion.button>
 
