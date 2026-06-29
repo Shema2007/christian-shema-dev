@@ -11,6 +11,8 @@ import Testimonials from './components/Testimonials'
 import Videos from './components/Videos'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import LoadingScreen from './components/LoadingScreen'
+import HireMe from './components/HireMe'
 
 function ScrollProgress() {
   const { scrollYProgress } = useScroll()
@@ -33,29 +35,57 @@ function ScrollProgress() {
 
 export default function App() {
   const [activePage, setActivePage] = useState<string>('home')
+  const [loaded, setLoaded] = useState(false)
+  const [hireMeOpen, setHireMeOpen] = useState(false)
+
+  const goToContact = () => {
+    setActivePage('home')
+    setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 80)
+  }
 
   return (
-    <div className="grid-bg" style={{ minHeight: '100vh' }}>
-      <ScrollProgress />
-      <Nav activePage={activePage} setActivePage={setActivePage} />
-      <main>
-        {activePage === 'home' && (
-          <>
-            <Hero setActivePage={setActivePage} />
-            <About />
-            <Services />
-            <TechStack />
-            <Projects />
-            <Blog />
-            <Testimonials />
-            <Videos />
-            <Contact />
-          </>
-        )}
-        {activePage === 'videos' && <Videos fullPage />}
-        {activePage === 'contact' && <Contact fullPage />}
-      </main>
-      <Footer setActivePage={setActivePage} />
-    </div>
+    <>
+      {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
+
+      <HireMe
+        open={hireMeOpen}
+        onClose={() => setHireMeOpen(false)}
+        onContact={() => { setHireMeOpen(false); goToContact() }}
+      />
+
+      <div
+        className="grid-bg"
+        style={{
+          minHeight: '100vh',
+          opacity: loaded ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+        }}
+      >
+        <ScrollProgress />
+        <Nav
+          activePage={activePage}
+          setActivePage={setActivePage}
+          onHireMe={() => setHireMeOpen(true)}
+        />
+        <main>
+          {activePage === 'home' && (
+            <>
+              <Hero setActivePage={setActivePage} />
+              <About />
+              <Services />
+              <TechStack />
+              <Projects />
+              <Blog />
+              <Testimonials />
+              <Videos />
+              <Contact />
+            </>
+          )}
+          {activePage === 'videos' && <Videos fullPage />}
+          {activePage === 'contact' && <Contact fullPage />}
+        </main>
+        <Footer setActivePage={setActivePage} onHireMe={() => setHireMeOpen(true)} />
+      </div>
+    </>
   )
 }
