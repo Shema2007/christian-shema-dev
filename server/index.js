@@ -127,11 +127,60 @@ app.post('/api/contact', async (req, res) => {
   }
   try {
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: GMAIL_USER, pass: GMAIL_PASS } })
+
+    // Notification email to Christian
     await transporter.sendMail({
-      from: `"${name}" <${GMAIL_USER}>`, to: 'christianirasubizashema@gmail.com',
-      replyTo: email, subject: `Portfolio message from ${name}`,
+      from: `"Portfolio Contact" <${GMAIL_USER}>`,
+      to: 'christianirasubizashema@gmail.com',
+      replyTo: email,
+      subject: `📩 New message from ${name} — Portfolio`,
       html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:12px"><h2 style="color:#1d4ed8;margin-top:0">New message via your portfolio</h2><table style="width:100%;border-collapse:collapse"><tr><td style="padding:8px 0;color:#555;font-weight:600;width:80px">Name</td><td style="padding:8px 0">${name}</td></tr><tr><td style="padding:8px 0;color:#555;font-weight:600">Email</td><td style="padding:8px 0"><a href="mailto:${email}">${email}</a></td></tr></table><hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0"/><p style="color:#111;white-space:pre-wrap;line-height:1.7">${message}</p></div>`,
     })
+
+    // Auto-reply to the sender
+    await transporter.sendMail({
+      from: `"Christian Shema" <${GMAIL_USER}>`,
+      to: email,
+      subject: `Thanks for reaching out, ${name}! 🙌`,
+      html: `
+        <div style="font-family:'Inter',sans-serif;max-width:540px;margin:0 auto;background:#070d1b;color:#e2e8f0;padding:0;border-radius:16px;overflow:hidden">
+          <!-- Header -->
+          <div style="background:linear-gradient(135deg,#1d4ed8,#4f46e5);padding:36px 32px;text-align:center">
+            <h1 style="margin:0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px">Message Received ✅</h1>
+            <p style="margin:10px 0 0;color:rgba(255,255,255,0.8);font-size:14px">Thanks for getting in touch, ${name}!</p>
+          </div>
+          <!-- Body -->
+          <div style="padding:32px">
+            <p style="margin:0 0 16px;line-height:1.75;color:#cbd5e1">Hey <strong style="color:#fff">${name}</strong>,</p>
+            <p style="margin:0 0 16px;line-height:1.75;color:#cbd5e1">
+              I received your message and I'll get back to you within <strong style="color:#60a5fa">24–48 hours</strong>.
+              I read every message personally and look forward to learning more about your project.
+            </p>
+            <!-- Message preview box -->
+            <div style="background:#0f172a;border:1px solid #1e3a5f;border-radius:10px;padding:16px 20px;margin:24px 0">
+              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#64748b">Your message</p>
+              <p style="margin:0;line-height:1.7;color:#94a3b8;white-space:pre-wrap;font-size:14px">${message}</p>
+            </div>
+            <p style="margin:0 0 24px;line-height:1.75;color:#cbd5e1">
+              While you wait, feel free to explore my work at
+              <a href="https://christian-shema-dev.replit.app" style="color:#60a5fa;text-decoration:none">christian-shema-dev.replit.app</a>.
+            </p>
+            <!-- CTA -->
+            <div style="text-align:center;margin:28px 0">
+              <a href="https://christian-shema-dev.replit.app/#projects" style="display:inline-block;padding:12px 28px;background:#1d4ed8;color:#fff;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none">View My Projects →</a>
+            </div>
+          </div>
+          <!-- Footer -->
+          <div style="padding:20px 32px;border-top:1px solid #1e293b;text-align:center">
+            <p style="margin:0;font-size:12px;color:#475569">
+              Christian Shema · Full-Stack Developer · Rwanda
+            </p>
+            <p style="margin:6px 0 0;font-size:11px;color:#334155;font-style:italic">Code with Purpose. Build for His Glory.</p>
+          </div>
+        </div>
+      `,
+    })
+
     res.json({ success: true })
   } catch (err) {
     console.error('[Contact] Email error:', err.message)

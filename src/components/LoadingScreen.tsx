@@ -71,7 +71,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
               <img
                 src="/logo.png"
                 alt="Shema Dev"
-                style={{ height: 80, filter: 'drop-shadow(0 0 20px rgba(59,130,246,0.6))' }}
+                style={{ height: 128, filter: 'drop-shadow(0 0 20px rgba(59,130,246,0.6))' }}
               />
             </motion.div>
 
