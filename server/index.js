@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_FILE = path.join(__dirname, 'videos.json')
 const BLOG_FILE = path.join(__dirname, 'blogs.json')
 const TESTIMONIALS_FILE = path.join(__dirname, 'testimonials.json')
+const VISITORS_FILE = path.join(__dirname, 'visitors.json')
 const DIST_DIR = path.join(__dirname, '..', 'dist')
 
 const app = express()
@@ -95,6 +96,20 @@ app.delete('/api/testimonials/:id', (req, res) => {
   const updated = list.filter(t => t.id !== req.params.id)
   if (updated.length === list.length) return res.status(404).json({ error: 'Not found' })
   write(TESTIMONIALS_FILE, updated); res.json({ success: true })
+})
+
+// ── Visitors ──────────────────────────────────────────────
+function readVisitors() {
+  try { return JSON.parse(fs.readFileSync(VISITORS_FILE, 'utf-8')) } catch { return { count: 0 } }
+}
+function writeVisitors(d) { fs.writeFileSync(VISITORS_FILE, JSON.stringify(d, null, 2)) }
+
+app.get('/api/visitors', (req, res) => res.json(readVisitors()))
+app.post('/api/visitors', (req, res) => {
+  const data = readVisitors()
+  data.count = (data.count || 0) + 1
+  writeVisitors(data)
+  res.json(data)
 })
 
 // ── Auth ──────────────────────────────────────────────────
