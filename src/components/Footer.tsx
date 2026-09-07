@@ -51,6 +51,7 @@ export default function Footer({ setActivePage, onHireMe }: FooterProps) {
       links: [
         { label: 'About', id: 'about' },
         { label: 'Services', id: 'services' },
+        { label: 'Electronics', id: 'electronics' },
         { label: 'Projects', id: 'projects' },
         { label: 'Blog', id: 'blog' },
       ],

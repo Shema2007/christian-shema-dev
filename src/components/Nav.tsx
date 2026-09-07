@@ -11,6 +11,7 @@ interface NavProps {
 const links = [
   { label: 'About', href: 'about' },
   { label: 'Services', href: 'services' },
+  { label: 'Electronics', href: 'electronics' },
   { label: 'Tech Stack', href: 'tech-stack' },
   { label: 'Projects', href: 'projects' },
   { label: 'Blog', href: 'blog' },

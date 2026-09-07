@@ -4,6 +4,7 @@ import Nav from './components/Nav'
 import Hero from './components/Hero'
 import About from './components/About'
 import Services from './components/Services'
+import Electronics from './components/Electronics'
 import TechStack from './components/TechStack'
 import Projects from './components/Projects'
 import Blog from './components/Blog'
@@ -73,6 +74,7 @@ export default function App() {
               <Hero setActivePage={setActivePage} />
               <About />
               <Services />
+              <Electronics onContact={goToContact} />
               <TechStack />
               <Projects />
               <Blog />
