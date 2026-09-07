@@ -12,7 +12,7 @@ const TWITTER_SVG = (<svg width="18" height="18" viewBox="0 0 24 24" fill="curre
 
 const socials = [
   { icon: GITHUB_SVG, href: 'https://github.com/Shema2007', label: 'GitHub' },
-  { icon: LINKEDIN_SVG, href: '#', label: 'LinkedIn' },
+  { icon: LINKEDIN_SVG, href: 'https://www.linkedin.com/search/results/all/?keywords=IRASUBIZA%20SHEMA%20Christian', label: 'LinkedIn' },
   { icon: TWITTER_SVG, href: '#', label: 'Twitter / X' },
 ]
 
@@ -76,6 +76,7 @@ export default function Contact({ fullPage }: ContactProps) {
             {[
               { href: 'mailto:christianirasubizashema@gmail.com', icon: <Mail size={17} color="var(--blue)" />, text: 'christianirasubizashema@gmail.com' },
               { href: 'tel:+250792773683', icon: <Phone size={17} color="var(--blue)" />, text: '+250 792 773 683' },
+              { href: 'https://www.linkedin.com/search/results/all/?keywords=IRASUBIZA%20SHEMA%20Christian', icon: LINKEDIN_SVG, text: 'IRASUBIZA SHEMA Christian · LinkedIn' },
             ].map(item => (
               <motion.a
                 key={item.href}
