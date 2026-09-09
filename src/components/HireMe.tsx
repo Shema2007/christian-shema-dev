@@ -14,7 +14,7 @@ const packages = [
   {
     icon: Zap,
     name: 'Quick Launch',
-    price: '$100',
+    price: '$250',
     period: 'flat rate',
     desc: 'Perfect for landing pages, portfolio sites, and simple web apps.',
     features: ['Responsive design', 'Up to 5 pages', 'Contact form', 'Deployed & live', '2 revision rounds'],
@@ -24,7 +24,7 @@ const packages = [
   {
     icon: Shield,
     name: 'Full Product',
-    price: '$300',
+    price: '$350',
     period: 'starting at',
     desc: 'Full-stack applications with database, auth, and custom features.',
     features: ['React + Node.js stack', 'Database integration', 'User authentication', 'Admin panel', 'Unlimited revisions'],
@@ -34,7 +34,7 @@ const packages = [
   {
     icon: Clock,
     name: 'Consulting',
-    price: '$50',
+    price: '$500',
     period: 'per hour',
     desc: 'Code reviews, architecture planning, and hands-on technical guidance.',
     features: ['Architecture review', 'Performance audit', 'Tech stack advice', 'Pair programming', 'Flexible hours'],
