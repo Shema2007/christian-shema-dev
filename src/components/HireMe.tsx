@@ -14,7 +14,7 @@ const packages = [
   {
     icon: Zap,
     name: 'Quick Launch',
-    price: '$500',
+    price: '$100',
     period: 'flat rate',
     desc: 'Perfect for landing pages, portfolio sites, and simple web apps.',
     features: ['Responsive design', 'Up to 5 pages', 'Contact form', 'Deployed & live', '2 revision rounds'],
@@ -24,7 +24,7 @@ const packages = [
   {
     icon: Shield,
     name: 'Full Product',
-    price: '$1,500',
+    price: '$300',
     period: 'starting at',
     desc: 'Full-stack applications with database, auth, and custom features.',
     features: ['React + Node.js stack', 'Database integration', 'User authentication', 'Admin panel', 'Unlimited revisions'],
