@@ -14,6 +14,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
 import HireMe from './components/HireMe'
+import AskAI from './components/AskAI'
 
 function ScrollProgress() {
   const { scrollYProgress } = useScroll()
@@ -87,6 +88,7 @@ export default function App() {
           {activePage === 'contact' && <Contact fullPage />}
         </main>
         <Footer setActivePage={setActivePage} onHireMe={() => setHireMeOpen(true)} />
+        <AskAI />
       </div>
     </>
   )
