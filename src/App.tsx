@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
@@ -14,7 +14,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
 import HireMe from './components/HireMe'
-import AskAI from './components/AskAI'
+const AskAI = lazy(() => import('./components/AskAI'))
 
 function ScrollProgress() {
   const { scrollYProgress } = useScroll()
@@ -88,7 +88,9 @@ export default function App() {
           {activePage === 'contact' && <Contact fullPage />}
         </main>
         <Footer setActivePage={setActivePage} onHireMe={() => setHireMeOpen(true)} />
-        <AskAI />
+        <Suspense fallback={null}>
+          <AskAI />
+        </Suspense>
       </div>
     </>
   )

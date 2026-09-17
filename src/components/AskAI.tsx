@@ -1,5 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { Bot, Loader2, MessageCircle, Send, Sparkles, X } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 type ChatMessage = {
   role: 'user' | 'assistant'
@@ -96,7 +98,38 @@ export default function AskAI() {
                   }`}
                 >
                   {message.role === 'assistant' && <Bot size={14} className="mb-1 text-blue-300" />}
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      ul: ({ children }) => <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>,
+                      ol: ({ children }) => <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
+                      h1: ({ children }) => <h1 className="mb-2 text-base font-bold text-white">{children}</h1>,
+                      h2: ({ children }) => <h2 className="mb-2 text-sm font-bold text-white">{children}</h2>,
+                      h3: ({ children }) => <h3 className="mb-1 text-sm font-bold text-white">{children}</h3>,
+                      a: ({ children, href }) => (
+                        <a href={href} target="_blank" rel="noreferrer" className="text-blue-300 underline decoration-blue-300/40 underline-offset-2 hover:text-blue-200">
+                          {children}
+                        </a>
+                      ),
+                      pre: ({ children }) => (
+                        <pre className="my-2 max-w-full overflow-x-auto rounded-xl border border-white/10 bg-slate-950/90 p-3 text-left">
+                          {children}
+                        </pre>
+                      ),
+                      code: ({ className, children, ...props }) => className ? (
+                        <code className="block min-w-max text-[12px] leading-relaxed text-blue-100" {...props}>
+                          {String(children).replace(/\n$/, '')}
+                        </code>
+                      ) : (
+                        <code className="rounded bg-blue-950/70 px-1.5 py-0.5 text-[0.9em] text-blue-200" {...props}>
+                          {children}
+                        </code>
+                      ),
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
                 </div>
               </div>
             ))}
