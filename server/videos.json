@@ -1,5 +1,14 @@
 [
   {
+    "id": "1789636057966",
+    "title": "how to use python in build AI in vs code",
+    "description": "This video will support us to know how the python language used within making AI",
+    "url": "https://youtu.be/bTMPwUgLZf0",
+    "thumbnail": "https://img.youtube.com/vi/bTMPwUgLZf0/maxresdefault.jpg",
+    "category": "Tutorial",
+    "date": "September 17, 2026"
+  },
+  {
     "id": "1",
     "title": "Building a Full-Stack Web App from Scratch — React, Node.js & PostgreSQL",
     "description": "A complete walkthrough of building and deploying a production-ready full-stack application using React, Node.js, Express, and PostgreSQL. From local setup to live deployment.",
