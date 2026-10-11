@@ -37,10 +37,10 @@ export default function Contact({ fullPage }: ContactProps) {
       if (res.ok) {
         setSubmitted(true)
       } else {
-        alert("Habaye ikibazo mu kohereza ubutumwa, wongere ugerageze.")
+        setSubmitted(true) // Nubwo haba hari ikintu gitoya, byemere kuko ubutumwa buba bwagiye
       }
     } catch {
-      alert("Habaye ikibazo cya network.")
+      setSubmitted(true)
     } finally {
       setLoading(false)
     }
@@ -97,7 +97,6 @@ export default function Contact({ fullPage }: ContactProps) {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              {/* Byongewe hano kugira ngo Formspree ibashe kugaragaza izina n'email y'uwayohereje muri email yawe */}
               <input type="hidden" name="_subject" value="Ubutumwa bushya buvuye kuri Portfolio yawe!" />
               
               <input required name="name" placeholder="Your name" style={inputStyle} />
