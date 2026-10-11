@@ -97,6 +97,9 @@ export default function Contact({ fullPage }: ContactProps) {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {/* Byongewe hano kugira ngo Formspree ibashe kugaragaza izina n'email y'uwayohereje muri email yawe */}
+              <input type="hidden" name="_subject" value="Ubutumwa bushya buvuye kuri Portfolio yawe!" />
+              
               <input required name="name" placeholder="Your name" style={inputStyle} />
               <input required type="email" name="email" placeholder="Your email" style={inputStyle} />
               <textarea required rows={4} name="message" placeholder="Tell me about your project..." style={{ ...inputStyle, resize: 'vertical' }} />
