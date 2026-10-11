@@ -17,33 +17,32 @@ const socials = [
 ]
 
 export default function Contact({ fullPage }: ContactProps) {
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const inputStyle: React.CSSProperties = { width: '100%', padding: '0.8rem 1rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', color: 'white', fontSize: '0.875rem', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s', boxSizing: 'border-box' }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setStatus('sending'); setErrorMsg('')
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const formEl = e.currentTarget
+    const data = new FormData(formEl)
+
     try {
-      const res = await fetch('https://formspree.io/f/mkjobkyl', { 
-        method: 'POST', 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }, 
-        body: JSON.stringify(form) 
+      const res = await fetch("https://formspree.io/f/mkjobkyl", {
+        method: "POST",
+        body: data,
+        headers: { 'Accept': 'application/json' }
       })
-      
-      if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        throw new Error((data && data.error) || 'Something went wrong')
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        alert("Habaye ikibazo mu kohereza ubutumwa, wongere ugerageze.")
       }
-      
-      setStatus('sent')
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to send')
-      setStatus('error')
+    } catch {
+      alert("Habaye ikibazo cya network.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -52,50 +51,21 @@ export default function Contact({ fullPage }: ContactProps) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'center' }}>
 
         {/* Left */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease }}
-        >
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.5rem' }}
-          >
+        <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, ease }}>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }} style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.5rem' }}>
             Let's Build Something Great.
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.75, marginBottom: '2.5rem', maxWidth: 420 }}
-          >
+          <motion.p initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.75, marginBottom: '2.5rem', maxWidth: 420 }}>
             Currently accepting new projects and consulting opportunities. Whether you have a specific project or just want to explore possibilities, let's talk.
           </motion.p>
 
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } } }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '2.5rem' }}
-          >
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } } }} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '2.5rem' }}>
             {[
               { href: 'mailto:christianirasubizashema@gmail.com', icon: <Mail size={17} color="var(--blue)" />, text: 'christianirasubizashema@gmail.com' },
               { href: 'tel:+250792773683', icon: <Phone size={17} color="var(--blue)" />, text: '+250 792 773 683' },
               { href: 'https://www.linkedin.com/search/results/all/?keywords=IRASUBIZA%20SHEMA%20Christian', icon: LINKEDIN_SVG, text: 'IRASUBIZA SHEMA Christian · LinkedIn' },
             ].map(item => (
-              <motion.a
-                key={item.href}
-                href={item.href}
-                variants={{ hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.5 } } }}
-                whileHover={{ borderColor: 'rgba(59,130,246,0.4)', background: 'rgba(59,130,246,0.06)', x: 4 }}
-                style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: 'var(--text)', fontWeight: 500, fontSize: '0.9rem' }}
-              >
+              <motion.a key={item.href} href={item.href} variants={{ hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.5 } } }} whileHover={{ borderColor: 'rgba(59,130,246,0.4)', background: 'rgba(59,130,246,0.06)', x: 4 }} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: 'var(--text)', fontWeight: 500, fontSize: '0.9rem' }}>
                 <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {item.icon}
                 </div>
@@ -104,23 +74,9 @@ export default function Contact({ fullPage }: ContactProps) {
             ))}
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } }}
-            style={{ display: 'flex', gap: '0.75rem' }}
-          >
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } }} style={{ display: 'flex', gap: '0.75rem' }}>
             {socials.map(({ icon, href, label }) => (
-              <motion.a
-                key={label}
-                href={href}
-                target="_blank" rel="noopener noreferrer"
-                aria-label={label}
-                variants={{ hidden: { opacity: 0, scale: 0.7 }, show: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 300 } } }}
-                whileHover={{ scale: 1.15, borderColor: 'rgba(59,130,246,0.4)', background: 'rgba(59,130,246,0.15)', color: 'var(--blue)' }}
-                style={{ width: 44, height: 44, borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}
-              >
+              <motion.a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} variants={{ hidden: { opacity: 0, scale: 0.7 }, show: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 300 } } }} whileHover={{ scale: 1.15, borderColor: 'rgba(59,130,246,0.4)', background: 'rgba(59,130,246,0.15)', color: 'var(--blue)' }} style={{ width: 44, height: 44, borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
                 {icon}
               </motion.a>
             ))}
@@ -128,33 +84,24 @@ export default function Contact({ fullPage }: ContactProps) {
         </motion.div>
 
         {/* Right: form */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease, delay: 0.1 }}
-          style={{ background: 'var(--navy-2)', border: '1px solid var(--border)', borderRadius: '20px', padding: '2.5rem' }}
-        >
+        <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, ease, delay: 0.1 }} style={{ background: 'var(--navy-2)', border: '1px solid var(--border)', borderRadius: '20px', padding: '2.5rem' }}>
           <h3 style={{ fontWeight: 700, fontSize: '1.15rem', marginBottom: '0.4rem' }}>Send a message</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.83rem', marginBottom: '1.75rem' }}>I usually reply within a few hours.</p>
 
-          {status === 'sent' ? (
+          {submitted ? (
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} style={{ textAlign: 'center', padding: '2.5rem 0' }}>
               <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✅</div>
               <h4 style={{ fontWeight: 700, marginBottom: '0.4rem' }}>Message sent!</h4>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>I'll get back to you soon.</p>
-              <button onClick={() => { setStatus('idle'); setForm({ name: '', email: '', message: '' }) }} style={{ color: 'var(--blue)', fontSize: '0.85rem', fontWeight: 600 }}>Send another →</button>
+              <button onClick={() => setSubmitted(false)} style={{ color: 'var(--blue)', fontSize: '0.85rem', fontWeight: 600 }}>Send another →</button>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              <input required placeholder="Your name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--blue)'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
-              <input required type="email" placeholder="Your email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} style={inputStyle} onFocus={e => e.target.style.borderColor = 'var(--blue)'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
-              <textarea required rows={4} placeholder="Tell me about your project..." value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} style={{ ...inputStyle, resize: 'vertical' }} onFocus={e => e.target.style.borderColor = 'var(--blue)'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
-              {status === 'error' && <p style={{ color: '#f87171', fontSize: '0.82rem' }}>⚠ {errorMsg}</p>}
-              <motion.button type="submit" disabled={status === 'sending'} whileHover={{ scale: status !== 'sending' ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}
-                style={{ padding: '0.85rem', background: status === 'sending' ? 'rgba(59,130,246,0.6)' : 'var(--blue)', color: 'white', borderRadius: '10px', fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: status === 'sending' ? 'not-allowed' : 'pointer' }}
-              >
-                {status === 'sending' ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…</> : <><Send size=data-size={15} /> Send Message</>}
+              <input required name="name" placeholder="Your name" style={inputStyle} />
+              <input required type="email" name="email" placeholder="Your email" style={inputStyle} />
+              <textarea required rows={4} name="message" placeholder="Tell me about your project..." style={{ ...inputStyle, resize: 'vertical' }} />
+              <motion.button type="submit" disabled={loading} whileHover={{ scale: loading ? 1 : 1.02 }} whileTap={{ scale: 0.98 }} style={{ padding: '0.85rem', background: loading ? 'rgba(59,130,246,0.6)' : 'var(--blue)', color: 'white', borderRadius: '10px', fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: loading ? 'not-allowed' : 'pointer' }}>
+                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…</> : <><Send size={15} /> Send Message</>}
               </motion.button>
             </form>
           )}
