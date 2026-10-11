@@ -26,9 +26,20 @@ export default function Contact({ fullPage }: ContactProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setStatus('sending'); setErrorMsg('')
     try {
-      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Something went wrong')
+      const res = await fetch('https://formspree.io/f/mkjobkyl', { 
+        method: 'POST', 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }, 
+        body: JSON.stringify(form) 
+      })
+      
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error((data && data.error) || 'Something went wrong')
+      }
+      
       setStatus('sent')
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Failed to send')
@@ -143,7 +154,7 @@ export default function Contact({ fullPage }: ContactProps) {
               <motion.button type="submit" disabled={status === 'sending'} whileHover={{ scale: status !== 'sending' ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}
                 style={{ padding: '0.85rem', background: status === 'sending' ? 'rgba(59,130,246,0.6)' : 'var(--blue)', color: 'white', borderRadius: '10px', fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: status === 'sending' ? 'not-allowed' : 'pointer' }}
               >
-                {status === 'sending' ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…</> : <><Send size={15} /> Send Message</>}
+                {status === 'sending' ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending…</> : <><Send size=data-size={15} /> Send Message</>}
               </motion.button>
             </form>
           )}
